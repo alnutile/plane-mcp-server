@@ -27,22 +27,9 @@ def register_project_tools(mcp: FastMCP) -> None:
         expand: str | None = None,
         fields: str | None = None,
         order_by: str | None = None,
-        **kwargs: Any,  # Added to catch extra args from n8n/Sim.ai
+        **kwargs: Any,
     ) -> list[Project]:
-        """
-        List all projects in a workspace.
-
-        Args:
-            workspace_slug: The workspace slug identifier
-            cursor: Pagination cursor for getting next set of results
-            per_page: Number of results per page (1-100)
-            expand: Comma-separated list of related fields to expand in response
-            fields: Comma-separated list of fields to include in response
-            order_by: Field to order results by. Prefix with '-' for descending order
-
-        Returns:
-            List of Project objects
-        """
+        """List all projects in a workspace."""
         client, workspace_slug = get_plane_client_context()
 
         params = PaginatedQueryParams(
@@ -81,10 +68,169 @@ def register_project_tools(mcp: FastMCP) -> None:
         external_source: str | None = None,
         external_id: str | None = None,
         is_issue_type_enabled: bool | None = None,
-        **kwargs: Any,  # Added to catch extra args from n8n/Sim.ai
+        **kwargs: Any,
     ) -> Project:
-        """
-        Create a new project.
+        """Create a new project."""
+        client, workspace_slug = get_plane_client_context()
 
-        Args:
-            workspace_slug: The workspace slug identifier
+        data = CreateProject(
+            name=name,
+            identifier=identifier,
+            description=description,
+            project_lead=project_lead,
+            default_assignee=default_assignee,
+            emoji=emoji,
+            cover_image=cover_image,
+            module_view=module_view,
+            cycle_view=cycle_view,
+            issue_views_view=issue_views_view,
+            page_view=page_view,
+            intake_view=intake_view,
+            guest_view_all_features=guest_view_all_features,
+            archive_in=archive_in,
+            close_in=close_in,
+            timezone=timezone,
+            external_source=external_source,
+            external_id=external_id,
+            is_issue_type_enabled=is_issue_type_enabled,
+        )
+
+        return client.projects.create(workspace_slug=workspace_slug, data=data)
+
+    @mcp.tool()
+    def retrieve_project(
+        project_id: str,
+        **kwargs: Any,
+    ) -> Project:
+        """Retrieve a project by ID."""
+        client, workspace_slug = get_plane_client_context()
+        return client.projects.retrieve(workspace_slug=workspace_slug, project_id=project_id)
+
+    @mcp.tool()
+    def update_project(
+        project_id: str,
+        name: str | None = None,
+        description: str | None = None,
+        project_lead: str | None = None,
+        default_assignee: str | None = None,
+        identifier: str | None = None,
+        emoji: str | None = None,
+        cover_image: str | None = None,
+        module_view: bool | None = None,
+        cycle_view: bool | None = None,
+        issue_views_view: bool | None = None,
+        page_view: bool | None = None,
+        intake_view: bool | None = None,
+        guest_view_all_features: bool | None = None,
+        archive_in: int | None = None,
+        close_in: int | None = None,
+        timezone: str | None = None,
+        external_source: str | None = None,
+        external_id: str | None = None,
+        is_issue_type_enabled: bool | None = None,
+        is_time_tracking_enabled: bool | None = None,
+        default_state: str | None = None,
+        estimate: str | None = None,
+        **kwargs: Any,
+    ) -> Project:
+        """Update a project by ID."""
+        client, workspace_slug = get_plane_client_context()
+
+        data = UpdateProject(
+            name=name,
+            description=description,
+            project_lead=project_lead,
+            default_assignee=default_assignee,
+            identifier=identifier,
+            emoji=emoji,
+            cover_image=cover_image,
+            module_view=module_view,
+            cycle_view=cycle_view,
+            issue_views_view=issue_views_view,
+            page_view=page_view,
+            intake_view=intake_view,
+            guest_view_all_features=guest_view_all_features,
+            archive_in=archive_in,
+            close_in=close_in,
+            timezone=timezone,
+            external_source=external_source,
+            external_id=external_id,
+            is_issue_type_enabled=is_issue_type_enabled,
+            is_time_tracking_enabled=is_time_tracking_enabled,
+            default_state=default_state,
+            estimate=estimate,
+        )
+
+        return client.projects.update(
+            workspace_slug=workspace_slug, project_id=project_id, data=data
+        )
+
+    @mcp.tool()
+    def delete_project(
+        project_id: str,
+        **kwargs: Any,
+    ) -> None:
+        """Delete a project by ID."""
+        client, workspace_slug = get_plane_client_context()
+        client.projects.delete(workspace_slug=workspace_slug, project_id=project_id)
+
+    @mcp.tool()
+    def get_project_worklog_summary(
+        project_id: str,
+        **kwargs: Any,
+    ) -> list[ProjectWorklogSummary]:
+        """Get work log summary for a project."""
+        client, workspace_slug = get_plane_client_context()
+        return client.projects.get_worklog_summary(
+            workspace_slug=workspace_slug, project_id=project_id
+        )
+
+    @mcp.tool()
+    def get_project_members(
+        project_id: str, 
+        params: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> list[UserLite]:
+        """Get all members of a project."""
+        client, workspace_slug = get_plane_client_context()
+        return client.projects.get_members(
+            workspace_slug=workspace_slug, project_id=project_id, params=params
+        )
+
+    @mcp.tool()
+    def get_project_features(
+        project_id: str,
+        **kwargs: Any,
+    ) -> ProjectFeature:
+        """Get features of a project."""
+        client, workspace_slug = get_plane_client_context()
+        return client.projects.get_features(workspace_slug=workspace_slug, project_id=project_id)
+
+    @mcp.tool()
+    def update_project_features(
+        project_id: str,
+        epics: bool | None = None,
+        modules: bool | None = None,
+        cycles: bool | None = None,
+        views: bool | None = None,
+        pages: bool | None = None,
+        intakes: bool | None = None,
+        work_item_types: bool | None = None,
+        **kwargs: Any,
+    ) -> ProjectFeature:
+        """Update features of a project."""
+        client, workspace_slug = get_plane_client_context()
+
+        data = ProjectFeature(
+            epics=epics,
+            modules=modules,
+            cycles=cycles,
+            views=views,
+            pages=pages,
+            intakes=intakes,
+            work_item_types=work_item_types,
+        )
+
+        return client.projects.update_features(
+            workspace_slug=workspace_slug, project_id=project_id, data=data
+        )
